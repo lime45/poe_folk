@@ -11,4 +11,5 @@ See [the changelog](CHANGELOG.md) to see what's changed over time.
 Go to https://github.com/lime45/poe_folk/releases and download setup.exe
 and COM.Port.Notify.msi
 
-Run setup.exe to install on your computer. That's it!
+Run setup.exe to install on your computer. When it is installed, the executable
+be (roughly) here: C:\Program Files (x86)\lime45\COM Port Notify
