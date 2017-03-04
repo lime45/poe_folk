@@ -2,6 +2,7 @@
 using System.Linq;
 using System.IO.Ports;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace ComPortNotify
 {
@@ -13,6 +14,7 @@ namespace ComPortNotify
         private static string[] portarray = SerialPort.GetPortNames();
         private string[] new_portarray;
         private string added_port, removed_port;
+        private string com_port;
         private NotifyIcon TrayIcon;
         private ContextMenuStrip TrayIconContextMenu;
         private System.ComponentModel.IContainer components;
@@ -77,8 +79,10 @@ namespace ComPortNotify
             this.TrayIconContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
 
-            TrayIconContextMenu.ResumeLayout(false);
-            TrayIcon.ContextMenuStrip = TrayIconContextMenu;
+        }
+        void notifyIcon_BalloonTipClicked(object sender, EventArgs e)
+        {
+            Clipboard.SetText(com_port);
         }
         protected override void SetVisibleCore(bool value)
         {
@@ -103,7 +107,10 @@ namespace ComPortNotify
                             added_port = new_portarray.Except(portarray).FirstOrDefault();
                             portarray = new_portarray;
                             if (added_port != null)
+                            {
                                 TrayIcon.ShowBalloonTip(500, added_port, " plugged in.", ToolTipIcon.Info);
+                                com_port = added_port;
+                            }
                             break;
 
                         case DBT_DEVICEREMOVECOMPLETE:
@@ -111,7 +118,10 @@ namespace ComPortNotify
                             removed_port = portarray.Except(new_portarray).FirstOrDefault();
                             portarray = new_portarray;
                             if (removed_port != null)
+                            {
                                 TrayIcon.ShowBalloonTip(500, removed_port, "removed.", ToolTipIcon.Info);
+                                com_port = removed_port;
+                            }
                             break;
                     }
                     break;
