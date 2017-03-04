@@ -37,9 +37,9 @@ namespace ComPortNotify
             this.StartOnBoot = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayIconContextMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // TrayIcon
-            // 
+            //
             this.TrayIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.TrayIcon.BalloonTipTitle = "COM Port Notifier";
             this.TrayIcon.BalloonTipClicked += new EventHandler(notifyIcon_BalloonTipClicked);
@@ -47,32 +47,32 @@ namespace ComPortNotify
             this.TrayIcon.ContextMenuStrip = this.TrayIconContextMenu;
             this.TrayIcon.Icon = global::ComPortNotify.Properties.Resources.serial_port;
             this.TrayIcon.Text = "COM Port Notifier";
-            // 
+            //
             // TrayIconContextMenu
-            // 
+            //
             this.TrayIconContextMenu.Items.AddRange(
                     new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
             this.TrayIconContextMenu.Items.AddRange(
                     new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
             this.TrayIconContextMenu.Name = "TrayIconContextMenu";
             this.TrayIconContextMenu.Size = new System.Drawing.Size(153, 70);
-            // 
+            //
             // CloseMenuItem
-            // 
+            //
             this.CloseMenuItem.Name = "CloseMenuItem";
             this.CloseMenuItem.Size = new System.Drawing.Size(152, 22);
             this.CloseMenuItem.Text = "Close COM Port Notifier";
             this.CloseMenuItem.Click += new System.EventHandler(this.CloseMenuItem_Click);
-            // 
+            //
             // StartOnBoot
-            // 
+            //
             this.StartOnBoot.Name = "StartOnBoot";
             this.StartOnBoot.Size = new System.Drawing.Size(152, 22);
             this.StartOnBoot.Text = "Start COM Port Notifier on Boot";
             this.StartOnBoot.Click += new System.EventHandler(this.StartOnBoot_Click);
-            // 
+            //
             // MyApplicationContext
-            // 
+            //
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Name = "MyApplicationContext";
             this.Load += new System.EventHandler(this.MyApplicationContext_Load);
