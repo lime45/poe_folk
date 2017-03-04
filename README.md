@@ -12,4 +12,8 @@ Go to https://github.com/lime45/poe_folk/releases and download setup.exe
 and COM.Port.Notify.msi
 
 Run setup.exe to install on your computer. When it is installed, the executable
-be (roughly) here: C:\Program Files (x86)\lime45\COM Port Notify
+be (roughly) here: C:\Program Files (x86)\lime45\COM Port Notify.
+
+## Usage
+1. If you click on the popup balloon, the COM port text will be place on the clipboard.
+2. Right clicking on the tray icon allows you to either: close this app, or add/remove this app from windows startup.
