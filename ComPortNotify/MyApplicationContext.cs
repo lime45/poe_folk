@@ -23,17 +23,7 @@ namespace ComPortNotify
             Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
             InitializeComponent();
 
-            if (MessageBox.Show("Start Monitoring for Serial Port Events?", 
-                    "Com Port Notifier", MessageBoxButtons.YesNo, 
-                    MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                TrayIcon.Visible = true;
-            }
-            else
-            {
-                Environment.Exit(0);
-            }
-
+           TrayIcon.Visible = true;
         }
 
         private void InitializeComponent()
