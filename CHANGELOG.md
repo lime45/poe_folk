@@ -17,5 +17,6 @@ See [Keep A Changelog](http://keepachangelog.com/).
 
 - Initial Release
 
-[Unreleased]: https://github.com/lime45/poe_folk/compare/v1.0.0...master
+[Unreleased]: https://github.com/lime45/poe_folk/compare/v1.0.1...master
+[1.0.1]: https://github.com/lime45/poe_folk/compare/v1.0.1...v1.0.0
 [1.0.0]: https://github.com/lime45/poe_folk/compare/v1.0.0
