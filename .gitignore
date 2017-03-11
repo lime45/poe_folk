@@ -6,6 +6,9 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.swp
+cscope.files
+tags
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -231,6 +234,11 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+# Visual Studio 2017 setup files
+**/*SetupFiles
+**/*Setup-cache
+
 
 # Visual Studio LightSwitch build output
 **/*.HTMLClient/GeneratedArtifacts
