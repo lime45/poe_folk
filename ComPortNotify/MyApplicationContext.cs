@@ -18,7 +18,7 @@ namespace ComPortNotify
         private NotifyIcon TrayIcon;
         private ContextMenuStrip TrayIconContextMenu;
         private System.ComponentModel.IContainer components;
-        private ToolStripMenuItem CloseMenuItem, StartOnBoot;
+        private ToolStripMenuItem CloseMenuItem, StartOnBoot, CheckForUpdates;
 
         public MyApplicationContext()
         {
@@ -35,6 +35,7 @@ namespace ComPortNotify
             this.TrayIconContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CloseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StartOnBoot = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayIconContextMenu.SuspendLayout();
             this.SuspendLayout();
             //
@@ -54,6 +55,8 @@ namespace ComPortNotify
                     new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
             this.TrayIconContextMenu.Items.AddRange(
                     new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
+            this.TrayIconContextMenu.Items.AddRange(
+                    new System.Windows.Forms.ToolStripItem[] { this.CheckForUpdates });
             this.TrayIconContextMenu.Name = "TrayIconContextMenu";
             this.TrayIconContextMenu.Size = new System.Drawing.Size(153, 70);
             //
@@ -70,6 +73,13 @@ namespace ComPortNotify
             this.StartOnBoot.Size = new System.Drawing.Size(152, 22);
             this.StartOnBoot.Text = "Start COM Port Notifier on Boot";
             this.StartOnBoot.Click += new System.EventHandler(this.StartOnBoot_Click);
+            //
+            // CheckForUpdates
+            //
+            this.CheckForUpdates.Name = "CheckForUpdates";
+            this.CheckForUpdates.Size = new System.Drawing.Size(152, 22);
+            this.CheckForUpdates.Text = "Check for updates";
+            this.CheckForUpdates.Click += new System.EventHandler(this.CheckForUpdates_Click);
             //
             // MyApplicationContext
             //
@@ -151,7 +161,50 @@ namespace ComPortNotify
                 RegisterInStartup(false);
             }
         }
-         private void CloseMenuItem_Click(object sender, EventArgs e)
+        private void CheckForUpdates_Click(object sender, EventArgs e)
+        {
+            if (NAppUpdate.Framework.UpdateManager.Instance.CheckForUpdates())
+            {
+                DialogResult dr = MessageBox.Show(
+                    string.Format("Updates are available to your software ({0} total). Do you want to download and prepare them now? You can always do this at a later time.",
+                    NAppUpdate.Framework.UpdateManager.Instance.UpdatesAvailable),
+                    "Software updates available",
+                     MessageBoxButtons.YesNo);
+
+                if (dr == DialogResult.Yes)
+                {
+                    //NAppUpdate.Framework.UpdateManager.Instance.PrepareUpdates();
+                    NAppUpdate.Framework.UpdateManager.Instance.PrepareUpdatesAsync(OnPrepareUpdatesCompleted);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Your software is up to date");
+            }
+        }
+        private void OnPrepareUpdatesCompleted(bool success)
+        {
+            if (success)
+            {
+                if (MessageBox.Show(
+                        string.Format("Updates are ready. Do you want to install them now?",
+                        NAppUpdate.Framework.UpdateManager.Instance.UpdatesAvailable),
+                        "Software updates ready",
+                         MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    NAppUpdate.Framework.UpdateManager.Instance.ApplyUpdates();
+                }
+            }
+            else
+            {
+                DialogResult dr = MessageBox.Show(
+                        string.Format("An error occurred while trying to prepare updates: {0}",
+                        NAppUpdate.Framework.UpdateManager.Instance.LatestError),
+                        "Update error occurred",
+                         MessageBoxButtons.OK);
+            }
+        }
+        private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Do you really want to exit?",
                     "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
