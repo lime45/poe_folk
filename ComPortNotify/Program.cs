@@ -11,7 +11,7 @@ namespace ComPortNotify
         [STAThread]
         static void Main()
         {
-            NAppUpdate.Framework.UpdateManager.Instance.UpdateSource = new NAppUpdate.Framework.Sources.SimpleWebSource("http://www.tylercrumpton.com/Random/poe/feed.xml");
+			NAppUpdate.Framework.UpdateManager.Instance.UpdateSource = new NAppUpdate.Framework.Sources.SimpleWebSource("https://www.dropbox.com/s/4czsu1rljsj7lec/feed.xml?dl=1");
             NAppUpdate.Framework.UpdateManager.Instance.ReinstateIfRestarted();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
