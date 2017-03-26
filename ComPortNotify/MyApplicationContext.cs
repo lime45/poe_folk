@@ -52,11 +52,11 @@ namespace ComPortNotify
             // TrayIconContextMenu
             //
             this.TrayIconContextMenu.Items.AddRange(
-                    new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
+                new System.Windows.Forms.ToolStripItem[] { this.CheckForUpdates });
             this.TrayIconContextMenu.Items.AddRange(
-                    new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
+                new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
             this.TrayIconContextMenu.Items.AddRange(
-                    new System.Windows.Forms.ToolStripItem[] { this.CheckForUpdates });
+                new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
             this.TrayIconContextMenu.Name = "TrayIconContextMenu";
             this.TrayIconContextMenu.Size = new System.Drawing.Size(153, 70);
             //
