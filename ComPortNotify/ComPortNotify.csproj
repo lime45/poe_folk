@@ -39,6 +39,9 @@
     <ApplicationIcon>1488507616_port.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NAppUpdate.Framework">
+      <HintPath>Resources\NAppUpdate.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

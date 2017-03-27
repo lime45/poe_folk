@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Feed>
+  <Tasks>
+    <FileUpdateTask hotswap="false" updateTo="https://www.dropbox.com/s/yr4x2ffr30u4ci6/ComPortNotify.exe?dl=0" localPath="ComPortNotify.exe">
+      <Description>implement updater and reordered menu items</Description>
+      <Conditions>
+        <FileVersionCondition what="below" version="1.0.4" />
+      </Conditions>
+    </FileUpdateTask>
+  </Tasks>
+</Feed>

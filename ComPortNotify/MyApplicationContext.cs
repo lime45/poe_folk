@@ -3,6 +3,10 @@ using System.Linq;
 using System.IO.Ports;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using NAppUpdate.Framework;
+using NAppUpdate.Framework.Common;
+using NAppUpdate.Framework.Sources;
+
 
 namespace ComPortNotify
 {
@@ -18,7 +22,7 @@ namespace ComPortNotify
         private NotifyIcon TrayIcon;
         private ContextMenuStrip TrayIconContextMenu;
         private System.ComponentModel.IContainer components;
-        private ToolStripMenuItem CloseMenuItem, StartOnBoot;
+        private ToolStripMenuItem CloseMenuItem, StartOnBoot, CheckForUpdates;
 
         public MyApplicationContext()
         {
@@ -35,6 +39,7 @@ namespace ComPortNotify
             this.TrayIconContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CloseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StartOnBoot = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayIconContextMenu.SuspendLayout();
             this.SuspendLayout();
             //
@@ -51,9 +56,11 @@ namespace ComPortNotify
             // TrayIconContextMenu
             //
             this.TrayIconContextMenu.Items.AddRange(
-                    new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
+                new System.Windows.Forms.ToolStripItem[] { this.CheckForUpdates });
             this.TrayIconContextMenu.Items.AddRange(
-                    new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
+                new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
+            this.TrayIconContextMenu.Items.AddRange(
+                new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
             this.TrayIconContextMenu.Name = "TrayIconContextMenu";
             this.TrayIconContextMenu.Size = new System.Drawing.Size(153, 70);
             //
@@ -70,6 +77,13 @@ namespace ComPortNotify
             this.StartOnBoot.Size = new System.Drawing.Size(152, 22);
             this.StartOnBoot.Text = "Start COM Port Notifier on Boot";
             this.StartOnBoot.Click += new System.EventHandler(this.StartOnBoot_Click);
+            //
+            // CheckForUpdates
+            //
+            this.CheckForUpdates.Name = "CheckForUpdates";
+            this.CheckForUpdates.Size = new System.Drawing.Size(152, 22);
+            this.CheckForUpdates.Text = "Check for updates";
+            this.CheckForUpdates.Click += new System.EventHandler(this.CheckForUpdates_Click);
             //
             // MyApplicationContext
             //
@@ -151,7 +165,70 @@ namespace ComPortNotify
                 RegisterInStartup(false);
             }
         }
-         private void CloseMenuItem_Click(object sender, EventArgs e)
+        private void CheckForUpdates_Click(object sender, EventArgs e)
+        {
+			// Get a local pointer to the UpdateManager instance
+			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
+
+            if (updManager.State != NAppUpdate.Framework.UpdateManager.UpdateProcessState.NotChecked)
+			   {
+				    MessageBox.Show("Update process has already initialized; current state: " + updManager.State.ToString());
+				    return;
+			   }
+
+            updManager.CheckForUpdates();
+            if (updManager.UpdatesAvailable != 0)
+            {
+                DialogResult dr = MessageBox.Show(
+                    string.Format("Updates are available to your software ({0} total). Do you want to download and prepare them now? You can always do this at a later time.",
+                    updManager.UpdatesAvailable),
+                    "Software updates available",
+                     MessageBoxButtons.YesNo);
+
+                if (dr == DialogResult.Yes)
+                {
+                    //NAppUpdate.Framework.UpdateManager.Instance.PrepareUpdates();
+                    updManager.BeginPrepareUpdates(OnPrepareUpdatesCompleted, null);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Your software is up to date");
+            }
+        }
+        private void OnPrepareUpdatesCompleted(IAsyncResult asyncResult)
+        {
+			try
+			{
+				((UpdateProcessAsyncResult)asyncResult).EndInvoke();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format("Updates preperation failed. Check the feed and try again.{0}{1}", Environment.NewLine, ex));
+				return;
+			}
+
+			// Get a local pointer to the UpdateManager instance
+			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
+
+			DialogResult dr = MessageBox.Show("Updates are ready to install. Do you wish to install them now?", "Software updates ready", MessageBoxButtons.YesNo);
+
+			if (dr != DialogResult.Yes)
+			{
+				return;
+			}
+			// This is a synchronous method by design, make sure to save all user work before calling
+			// it as it might restart your application
+			try
+			{
+				updManager.ApplyUpdates(true, false, false);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format("Error while trying to install software updates{0}{1}", Environment.NewLine, ex));
+			}
+       }
+        private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Do you really want to exit?",
                     "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
