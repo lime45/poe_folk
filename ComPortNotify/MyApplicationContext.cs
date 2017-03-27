@@ -167,14 +167,13 @@ namespace ComPortNotify
         }
         private void CheckForUpdates_Click(object sender, EventArgs e)
         {
-			// Get a local pointer to the UpdateManager instance
-			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
+            // Get a local pointer to the UpdateManager instance
+            UpdateManager updManager = UpdateManager.Instance;
+            NauConfigurations nConfig = null;
 
-            if (updManager.State != NAppUpdate.Framework.UpdateManager.UpdateProcessState.NotChecked)
-			   {
-				    MessageBox.Show("Update process has already initialized; current state: " + updManager.State.ToString());
-				    return;
-			   }
+            // change these names to something besides 'foo'
+            nConfig.UpdateExecutableName = "poe_update.exe";
+            nConfig.UpdateProcessName = "poe_update";
 
             updManager.CheckForUpdates();
             if (updManager.UpdatesAvailable != 0)
