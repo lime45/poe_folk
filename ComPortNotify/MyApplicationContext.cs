@@ -3,6 +3,10 @@ using System.Linq;
 using System.IO.Ports;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using NAppUpdate.Framework;
+using NAppUpdate.Framework.Common;
+using NAppUpdate.Framework.Sources;
+
 
 namespace ComPortNotify
 {
@@ -163,18 +167,28 @@ namespace ComPortNotify
         }
         private void CheckForUpdates_Click(object sender, EventArgs e)
         {
-            if (NAppUpdate.Framework.UpdateManager.Instance.CheckForUpdates())
+			// Get a local pointer to the UpdateManager instance
+			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
+
+            if (updManager.State != NAppUpdate.Framework.UpdateManager.UpdateProcessState.NotChecked)
+			   {
+				    MessageBox.Show("Update process has already initialized; current state: " + updManager.State.ToString());
+				    return;
+			   }
+
+            updManager.CheckForUpdates();
+            if (updManager.UpdatesAvailable != 0)
             {
                 DialogResult dr = MessageBox.Show(
                     string.Format("Updates are available to your software ({0} total). Do you want to download and prepare them now? You can always do this at a later time.",
-                    NAppUpdate.Framework.UpdateManager.Instance.UpdatesAvailable),
+                    updManager.UpdatesAvailable),
                     "Software updates available",
                      MessageBoxButtons.YesNo);
 
                 if (dr == DialogResult.Yes)
                 {
                     //NAppUpdate.Framework.UpdateManager.Instance.PrepareUpdates();
-                    NAppUpdate.Framework.UpdateManager.Instance.PrepareUpdatesAsync(OnPrepareUpdatesCompleted);
+                    updManager.BeginPrepareUpdates(OnPrepareUpdatesCompleted, null);
                 }
             }
             else
@@ -182,28 +196,38 @@ namespace ComPortNotify
                 MessageBox.Show("Your software is up to date");
             }
         }
-        private void OnPrepareUpdatesCompleted(bool success)
+        private void OnPrepareUpdatesCompleted(IAsyncResult asyncResult)
         {
-            if (success)
-            {
-                if (MessageBox.Show(
-                        string.Format("Updates are ready. Do you want to install them now?",
-                        NAppUpdate.Framework.UpdateManager.Instance.UpdatesAvailable),
-                        "Software updates ready",
-                         MessageBoxButtons.YesNo) == DialogResult.Yes)
-                {
-                    NAppUpdate.Framework.UpdateManager.Instance.ApplyUpdates();
-                }
-            }
-            else
-            {
-                DialogResult dr = MessageBox.Show(
-                        string.Format("An error occurred while trying to prepare updates: {0}",
-                        NAppUpdate.Framework.UpdateManager.Instance.LatestError),
-                        "Update error occurred",
-                         MessageBoxButtons.OK);
-            }
-        }
+			try
+			{
+				((UpdateProcessAsyncResult)asyncResult).EndInvoke();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format("Updates preperation failed. Check the feed and try again.{0}{1}", Environment.NewLine, ex));
+				return;
+			}
+
+			// Get a local pointer to the UpdateManager instance
+			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
+
+			DialogResult dr = MessageBox.Show("Updates are ready to install. Do you wish to install them now?", "Software updates ready", MessageBoxButtons.YesNo);
+
+			if (dr != DialogResult.Yes)
+			{
+				return;
+			}
+			// This is a synchronous method by design, make sure to save all user work before calling
+			// it as it might restart your application
+			try
+			{
+				updManager.ApplyUpdates(true, false, false);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format("Error while trying to install software updates{0}{1}", Environment.NewLine, ex));
+			}
+       }
         private void CloseMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Do you really want to exit?",
