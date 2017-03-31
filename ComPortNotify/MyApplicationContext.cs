@@ -169,12 +169,13 @@ namespace ComPortNotify
         {
             // Get a local pointer to the UpdateManager instance
             UpdateManager updManager = UpdateManager.Instance;
-			var nConfig = new NauConfigurations{
-				// change these names to something besides 'foo'
-				UpdateExecutableName = "poe_update.exe",
-				UpdateProcessName = "poe_update"
-			};
-			updManager.CheckForUpdates();
+            NauConfigurations nConfig = null;
+
+            // change these names to something besides 'foo'
+            nConfig.UpdateExecutableName = "poe_update.exe";
+            nConfig.UpdateProcessName = "poe_update";
+
+            updManager.CheckForUpdates();
             if (updManager.UpdatesAvailable != 0)
             {
                 DialogResult dr = MessageBox.Show(
