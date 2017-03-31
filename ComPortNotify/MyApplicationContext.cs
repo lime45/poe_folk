@@ -171,10 +171,9 @@ namespace ComPortNotify
 			NAppUpdate.Framework.UpdateManager updManager = NAppUpdate.Framework.UpdateManager.Instance;
 
             if (updManager.State != NAppUpdate.Framework.UpdateManager.UpdateProcessState.NotChecked)
-			   {
-				    MessageBox.Show("Update process has already initialized; current state: " + updManager.State.ToString());
-				    return;
-			   }
+			{
+				updManager.CleanUp();
+			}
 
             updManager.CheckForUpdates();
             if (updManager.UpdatesAvailable != 0)
