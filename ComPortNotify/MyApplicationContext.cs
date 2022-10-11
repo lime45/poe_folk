@@ -8,6 +8,7 @@ using NAppUpdate.Framework.Common;
 using NAppUpdate.Framework.Sources;
 using System.Diagnostics;
 using Microsoft.VisualBasic;
+using System.Collections.Generic;
 
 namespace ComPortNotify
 {
@@ -17,6 +18,7 @@ namespace ComPortNotify
         private const int DBT_DEVICEARRIVAL = 0x8000;
         private const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
         private static string[] portarray = SerialPort.GetPortNames();
+        private static List<ToolStripItem> menuComItems = new List<ToolStripItem>();
         private string[] new_portarray;
         private string added_port, removed_port;
         private string com_port;
@@ -68,6 +70,10 @@ namespace ComPortNotify
                 new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
             this.TrayIconContextMenu.Items.AddRange(
                 new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
+            this.TrayIconContextMenu.Items.Add(new ToolStripSeparator());
+            // Read all COM port
+            initPortMenu();
+
             this.TrayIconContextMenu.Name = "TrayIconContextMenu";
             this.TrayIconContextMenu.Size = new System.Drawing.Size(153, 70);
             //
@@ -108,6 +114,18 @@ namespace ComPortNotify
             this.ResumeLayout(false);
 
         }
+
+        private void initPortMenu()
+        {
+            foreach (ToolStripItem item in menuComItems)
+            {
+                TrayIconContextMenu.Items.Remove(item);
+            }
+            foreach (string port in portarray)
+            {
+                menuComItems.Add(this.TrayIconContextMenu.Items.Add(port, null, new System.EventHandler((sender, e) => PortItem_Click(sender, e, port))));
+            }
+        }
         void notifyIcon_BalloonTipClicked(object sender, EventArgs e)
         {
             if(new_com_port)
@@ -141,6 +159,7 @@ namespace ComPortNotify
                                 TrayIcon.ShowBalloonTip(500, added_port, " plugged in.", ToolTipIcon.Info);
                                 com_port = added_port;
                                 new_com_port = true;
+                                initPortMenu();
                             }
                             break;
 
@@ -153,6 +172,7 @@ namespace ComPortNotify
                                 TrayIcon.ShowBalloonTip(500, removed_port, "removed.", ToolTipIcon.Info);
                                 com_port = removed_port;
                                 new_com_port = false;
+                                initPortMenu();
                             }
                             break;
                     }
@@ -178,6 +198,10 @@ namespace ComPortNotify
             string inputArg = Interaction.InputBox("Launcher command arguments\n%1 = COMX", "Terminal Setup", terminalCommandArg);
             if (!inputArg.Equals(""))
                 terminalCommandArg = inputArg;
+        }
+        private void PortItem_Click(object sender, EventArgs e, string port)
+        {
+            Process.Start(terminalCommandProcess, terminalCommandArg.Replace("%1", port));
         }
         private void StartOnBoot_Click(object sender, EventArgs e)
         {
