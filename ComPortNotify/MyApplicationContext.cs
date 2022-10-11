@@ -6,7 +6,8 @@ using Microsoft.Win32;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Common;
 using NAppUpdate.Framework.Sources;
-
+using System.Diagnostics;
+using Microsoft.VisualBasic;
 
 namespace ComPortNotify
 {
@@ -19,10 +20,13 @@ namespace ComPortNotify
         private string[] new_portarray;
         private string added_port, removed_port;
         private string com_port;
+        private bool new_com_port = false;
+        private string terminalCommandProcess = "C:\\Program Files\\PuTTY\\putty.exe";
+        private string terminalCommandArg = "-serial %1 -sercfg 115200,8,n,1,N";
         private NotifyIcon TrayIcon;
         private ContextMenuStrip TrayIconContextMenu;
         private System.ComponentModel.IContainer components;
-        private ToolStripMenuItem CloseMenuItem, StartOnBoot, CheckForUpdates;
+        private ToolStripMenuItem CloseMenuItem, StartOnBoot, TerminalSetup, CheckForUpdates;
 
         public MyApplicationContext()
         {
@@ -39,6 +43,7 @@ namespace ComPortNotify
             this.TrayIconContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.CloseMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StartOnBoot = new System.Windows.Forms.ToolStripMenuItem();
+            this.TerminalSetup = new System.Windows.Forms.ToolStripMenuItem();
             this.CheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayIconContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -58,6 +63,8 @@ namespace ComPortNotify
             this.TrayIconContextMenu.Items.AddRange(
                 new System.Windows.Forms.ToolStripItem[] { this.CheckForUpdates });
             this.TrayIconContextMenu.Items.AddRange(
+                new System.Windows.Forms.ToolStripItem[] { this.TerminalSetup });
+            this.TrayIconContextMenu.Items.AddRange(
                 new System.Windows.Forms.ToolStripItem[] { this.StartOnBoot });
             this.TrayIconContextMenu.Items.AddRange(
                 new System.Windows.Forms.ToolStripItem[] { this.CloseMenuItem });
@@ -70,6 +77,13 @@ namespace ComPortNotify
             this.CloseMenuItem.Size = new System.Drawing.Size(152, 22);
             this.CloseMenuItem.Text = "Close COM Port Notifier";
             this.CloseMenuItem.Click += new System.EventHandler(this.CloseMenuItem_Click);
+            //
+            // TerminalSetup
+            //
+            this.TerminalSetup.Name = "TerminalSetup";
+            this.TerminalSetup.Size = new System.Drawing.Size(152, 22);
+            this.TerminalSetup.Text = "Terminal Setup";
+            this.TerminalSetup.Click += new System.EventHandler(this.TerminalSetup_Click);
             //
             // StartOnBoot
             //
@@ -96,6 +110,8 @@ namespace ComPortNotify
         }
         void notifyIcon_BalloonTipClicked(object sender, EventArgs e)
         {
+            if(new_com_port)
+                Process.Start(terminalCommandProcess, terminalCommandArg.Replace("%1", com_port));
             Clipboard.SetText(com_port);
         }
         protected override void SetVisibleCore(bool value)
@@ -124,6 +140,7 @@ namespace ComPortNotify
                             {
                                 TrayIcon.ShowBalloonTip(500, added_port, " plugged in.", ToolTipIcon.Info);
                                 com_port = added_port;
+                                new_com_port = true;
                             }
                             break;
 
@@ -135,6 +152,7 @@ namespace ComPortNotify
                             {
                                 TrayIcon.ShowBalloonTip(500, removed_port, "removed.", ToolTipIcon.Info);
                                 com_port = removed_port;
+                                new_com_port = false;
                             }
                             break;
                     }
@@ -151,6 +169,15 @@ namespace ComPortNotify
         private void MyApplicationContext_Load(object sender, EventArgs e)
         {
 
+        }
+        private void TerminalSetup_Click(object sender, EventArgs e)
+        {
+            string inputProcess = Interaction.InputBox("Launcher command process", "Terminal Setup", terminalCommandProcess);
+            if(!inputProcess.Equals(""))
+                terminalCommandProcess = inputProcess;
+            string inputArg = Interaction.InputBox("Launcher command arguments\n%1 = COMX", "Terminal Setup", terminalCommandArg);
+            if (!inputArg.Equals(""))
+                terminalCommandArg = inputArg;
         }
         private void StartOnBoot_Click(object sender, EventArgs e)
         {
