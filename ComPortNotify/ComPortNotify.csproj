@@ -39,6 +39,7 @@
     <ApplicationIcon>1488507616_port.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NAppUpdate.Framework">
       <HintPath>Resources\NAppUpdate.Framework.dll</HintPath>
     </Reference>
